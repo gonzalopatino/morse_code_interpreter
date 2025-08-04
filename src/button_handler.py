@@ -4,7 +4,7 @@ import RPi.GPIO as GPIO
 import time
 
 class ButtonHandler:
-    def __init__(self, button_pin: int, callback=None, bouncetime_ms: int = 300):
+    def __init__(self, button_pin: int, callback=None, bouncetime_ms: int = 500):
         self.button_pin = button_pin
         self.callback = callback
 
