@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: morse_code_interpreter
+Version: 0.1
+Summary: Morse code GPIO interpreter for Raspberry Pi
+Author: Your Name
+Dynamic: author
+Dynamic: summary
