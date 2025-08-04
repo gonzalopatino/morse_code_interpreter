@@ -4,17 +4,19 @@ import RPi.GPIO as GPIO
 import time
 
 class ButtonHandler:
-    def __init__(self, button_pin: int, callback=None, bouncetime_ms: int = 500):
+    def __init__(self, button_pin: int, callback=None, bouncetime_ms: int = 300):
         self.button_pin = button_pin
         self.callback = callback
 
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.button_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+
 
         # Attach the interrupt
         GPIO.add_event_detect(
             self.button_pin,
-            GPIO.RISING,
+            GPIO.FALLING,
             callback=self._internal_callback,
             bouncetime=bouncetime_ms
         )
