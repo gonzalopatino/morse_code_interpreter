@@ -1,5 +1,11 @@
-from led_controller import LEDController      # correct after install
+import sys
+import os
 import time
+
+# ✅ Fix: Add parent directory to import path BEFORE importing from src
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from src.led_controller import LEDController  # this works now
 
 led = LEDController(red_pin=23, blue_pin=24)
 
