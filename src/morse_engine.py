@@ -43,10 +43,12 @@ class MorseEngine(threading.Thread):
 
     def run(self):
         print("🚦 MorseEngine FSM started.")
-        while self.running:
-            print(f"🧠 [STATE]: {self.state.name}")   # ADD THIS LINE
-            self._tick()
+        while not self._stop_flag.is_set():
+            print(f"🧠 [STATE]: {self.state.name}")
+            if not self._tick():
+                break
             time.sleep(0.1)
+        print("✅ MorseEngine stopped.")
 
     def _tick(self):
         if self.state == State.IDLE:
@@ -58,63 +60,49 @@ class MorseEngine(threading.Thread):
                 print("⏳ Queue is empty")
 
         elif self.state == State.FETCHING:
-            self.current_message = self.queue.next_message()  # <-- FIXED
+            self.current_message = self.queue.next_message()
             if self.current_message is None:
                 self.state = State.IDLE
-                return
+                return True
             print(f"📥 Fetching: {self.current_message}")
-            self.lcd.clear()
-            self.lcd.show_message("Sending:", self.current_message[:16].ljust(16))
-
+            self.lcd.show_message("Sending:", self.current_message[:16])
             self.state = State.ENCODING
-
-
 
         elif self.state == State.ENCODING:
             encoded = self.encoder.encode(self.current_message)
             print(f"🔠 Morse: {encoded}")
             self.morse_sequence = "".join(encoded)
             print(f"🔠 Morse (flat): {self.morse_sequence}")
-
-
             self.state = State.PLAYING
-
-
-
 
         elif self.state == State.PLAYING:
             for symbol in self._flatten_morse(self.morse_sequence):
                 if self._stop_flag.is_set():
-                    return
-
+                    print("🛑 Stop flag detected during PLAYING")
+                    return False  # Exit thread
                 if self._skip_flag.is_set():
                     print("⏩ Skipping current message...")
                     self._skip_flag.clear()
-                    break  # Exit early
-
+                    break
                 if symbol == ".":
                     self.leds.flash_dot()
                 elif symbol == "-":
                     self.leds.flash_dash()
                 elif symbol == "/":
-                    time.sleep(1.0)  # inter-word
+                    time.sleep(1.0)
                 else:
-                    time.sleep(0.5)  # inter-character
-
+                    time.sleep(0.5)
             self.state = State.ADVANCING
-
-
-
 
         elif self.state == State.ADVANCING:
             print("➡️ Advancing to next message")
-            
             if self.queue.should_skip():
                 skipped = self.queue.next_message()
                 print(f"⏩ Skipping message: {skipped}")
                 self.queue.clear_skip_flag()
-            
             self.state = State.IDLE
+
+        return True  # Continue loop
 
  
 
@@ -124,5 +112,16 @@ class MorseEngine(threading.Thread):
 
     def _flatten_morse(self, morse_sequence: list[str]) -> str:
         return ''.join(morse_sequence)
+
+    def _sleep_interruptible(self, duration):
+        """Sleep in small chunks to allow fast shutdown."""
+        elapsed = 0
+        interval = 0.05  # 50ms
+        while elapsed < duration:
+            if self._stop_flag.is_set():
+                break
+            time.sleep(interval)
+            elapsed += interval
+
 
 

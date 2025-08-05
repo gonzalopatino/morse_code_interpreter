@@ -1,5 +1,4 @@
-# src/lcd_display.py
-
+import time
 import board
 import digitalio
 import adafruit_character_lcd.character_lcd as characterlcd
@@ -31,6 +30,15 @@ class LCDDisplay:
         self.lcd.clear()
 
     def cleanup(self):
-        self.clear()
-        for pin in [self.lcd_rs, self.lcd_en, self.lcd_d4, self.lcd_d5, self.lcd_d6, self.lcd_d7]:
-            pin.deinit()
+        try:
+            self.show_message("Shutting down", "")
+            time.sleep(1)
+            self.clear()
+        except Exception as e:
+            print(f"⚠️ LCD cleanup warning: {e}")
+        finally:
+            for pin in [self.lcd_rs, self.lcd_en, self.lcd_d4, self.lcd_d5, self.lcd_d6, self.lcd_d7]:
+                try:
+                    pin.deinit()
+                except Exception:
+                    pass

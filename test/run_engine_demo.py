@@ -43,9 +43,11 @@ except KeyboardInterrupt:
     print("\n🛑 Stopping MorseEngine...")
     engine.stop()
     engine.join()
+    
 finally:
+    lcd.clear()
+    lcd.cleanup()       # LCD must clean up first before GPIOs are reset
     button.cleanup()
     leds.cleanup()
-    lcd.cleanup()
     print("🧹 Cleaned up GPIO, LCD, and button")
 
