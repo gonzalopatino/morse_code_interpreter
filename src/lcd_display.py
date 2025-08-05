@@ -23,8 +23,12 @@ class LCDDisplay:
         self.clear()
 
     def show_message(self, line1: str, line2: str = ""):
-        message = f"{line1[:16]}\n{line2[:16]}"
+        # Pad lines to exactly 16 characters to clear previous content
+        line1 = line1[:16].ljust(16)
+        line2 = line2[:16].ljust(16)
+        message = f"{line1}\n{line2}"
         self.lcd.message = message
+
 
     def clear(self):
         self.lcd.clear()
