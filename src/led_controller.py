@@ -18,17 +18,21 @@ class LEDController:
         GPIO.setup(self.blue_pin, GPIO.OUT)
 
     def flash_dot(self):
-        print("⚡️ flash_dot()")
+        duration = 0.5
+        print(f"⚪ DOT: RED LED ON (GPIO {self.red_pin}) for {duration}s")
         GPIO.output(self.red_pin, GPIO.HIGH)
-        time.sleep(0.5)
+        time.sleep(duration)
         GPIO.output(self.red_pin, GPIO.LOW)
+        print(f"🔴 RED LED OFF\n")
         time.sleep(0.2)
 
     def flash_dash(self):
-        print("⚡️ flash_dash()")
+        duration = 1.5
+        print(f"➖ DASH: BLUE LED ON (GPIO {self.blue_pin}) for {duration}s")
         GPIO.output(self.blue_pin, GPIO.HIGH)
-        time.sleep(1.5)
+        time.sleep(duration)
         GPIO.output(self.blue_pin, GPIO.LOW)
+        print(f"🔵 BLUE LED OFF\n")
         time.sleep(0.2)
 
     def cleanup(self):

@@ -26,3 +26,7 @@ class MessageQueue:
     def clear(self):
         self._queue.clear()
         self._current = None
+
+    def size(self) -> int:
+        return len(self._queue)
+
