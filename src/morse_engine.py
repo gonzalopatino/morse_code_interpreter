@@ -4,10 +4,10 @@ import threading
 import time
 from enum import Enum, auto
 
-from message_queue import MessageQueue
-from led_controller import LEDController
-from morse_encoder import MorseEncoder
-from lcd_display import LCDDisplay
+from src.message_queue import MessageQueue
+from src.led_controller import LEDController
+from src.morse_encoder import MorseEncoder
+from src.lcd_display import LCDDisplay
 
 
 class State(Enum):
@@ -89,7 +89,8 @@ class MorseEngine(threading.Thread):
             self.state = State.ADVANCING
 
 
+
         elif self.state == State.ADVANCING:
             print("➡️ Advancing to next message")
-            self.state = State.IDLE  # Removed queue.next_message()
+            self.state = State.IDLE  
 

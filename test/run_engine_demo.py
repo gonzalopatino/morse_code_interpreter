@@ -7,17 +7,19 @@ import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from led_controller import LEDController
-from message_queue import MessageQueue
-from lcd_display import LCDDisplay
-from morse_engine import MorseEngine
+from src.button_handler import ButtonHandler
+from src.led_controller import LEDController
+from src.message_queue import MessageQueue
+from src.lcd_display import LCDDisplay
+from src.morse_engine import MorseEngine
 
 # Initialize components
 leds = LEDController(red_pin=23, blue_pin=24)
 queue = MessageQueue()
 lcd = LCDDisplay()
+button = ButtonHandler(button_pin=18, callback=lambda: queue.skip_to_next())
 engine = MorseEngine(leds, queue, lcd)
 
 try:
@@ -40,6 +42,8 @@ except KeyboardInterrupt:
     engine.stop()
     engine.join()
 finally:
+    button.cleanup()
     leds.cleanup()
     lcd.cleanup()
-    print("🧹 Cleaned up GPIO and LCD")
+    print("🧹 Cleaned up GPIO, LCD, and button")
+

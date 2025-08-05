@@ -33,3 +33,8 @@ class MessageQueue:
 
     def size(self) -> int:
         return len(self._queue)
+
+    def skip_to_next(self):
+        self._current = None
+       
+
