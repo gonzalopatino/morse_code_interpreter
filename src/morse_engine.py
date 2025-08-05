@@ -55,7 +55,7 @@ class MorseEngine(threading.Thread):
                 print("⏳ Queue is empty")
 
         elif self.state == State.FETCHING:
-            self.current_message = self.queue.next_message()
+            self.current_message = self.queue.next_message()  # <-- FIXED
             if self.current_message is None:
                 self.state = State.IDLE
                 return
@@ -64,10 +64,13 @@ class MorseEngine(threading.Thread):
             self.state = State.ENCODING
 
 
+
         elif self.state == State.ENCODING:
-            encoded = self.encoder.encode(self.current_message)  # ['....', '.', '.-..', ...]
-            self.morse_sequence = "".join(self.encoder.encode(self.current_message))
+            encoded = self.encoder.encode(self.current_message)
+            print(f"🔠 Morse: {encoded}")
+            self.morse_sequence = "".join(encoded)
             print(f"🔠 Morse (flat): {self.morse_sequence}")
+
 
             self.state = State.PLAYING
 
@@ -88,5 +91,5 @@ class MorseEngine(threading.Thread):
 
         elif self.state == State.ADVANCING:
             print("➡️ Advancing to next message")
-            self.queue.next_message()
-            self.state = State.IDLE
+            self.state = State.IDLE  # Removed queue.next_message()
+
