@@ -18,8 +18,10 @@ from src.morse_engine import MorseEngine
 # Initialize components
 leds = LEDController(red_pin=23, blue_pin=24)
 queue = MessageQueue()
+print(queue.__class__)  # Add this temporarily
 lcd = LCDDisplay()
-button = ButtonHandler(button_pin=18, callback=lambda: queue.skip_to_next())
+button = ButtonHandler(button_pin=18, callback=lambda: queue.skip_next())
+
 engine = MorseEngine(leds, queue, lcd)
 
 try:

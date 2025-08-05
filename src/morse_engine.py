@@ -8,6 +8,7 @@ from src.message_queue import MessageQueue
 from src.led_controller import LEDController
 from src.morse_encoder import MorseEncoder
 from src.lcd_display import LCDDisplay
+from threading import Event
 
 
 class State(Enum):
@@ -30,6 +31,8 @@ class MorseEngine(threading.Thread):
         self.current_message = ""
         self.morse_sequence = ""
         self.running = False
+        self._skip_flag = Event()
+
 
     def start(self):
         self.running = True
@@ -48,7 +51,7 @@ class MorseEngine(threading.Thread):
     def _tick(self):
         if self.state == State.IDLE:
             print("🛑 IDLE: checking for messages")
-            if self.queue.has_next():
+            if self.queue.has_messages():
                 print("✅ Message(s) available")
                 self.state = State.FETCHING
             else:
@@ -74,23 +77,50 @@ class MorseEngine(threading.Thread):
 
             self.state = State.PLAYING
 
+
+
+
         elif self.state == State.PLAYING:
-            for symbol in self.morse_sequence:
+            for symbol in self._flatten_morse(self.morse_sequence):
                 if self._stop_flag.is_set():
                     return
+
+                if self._skip_flag.is_set():
+                    print("⏩ Skipping current message...")
+                    self._skip_flag.clear()
+                    break  # Exit early
+
                 if symbol == ".":
                     self.leds.flash_dot()
                 elif symbol == "-":
                     self.leds.flash_dash()
                 elif symbol == "/":
-                    time.sleep(1.0)
+                    time.sleep(1.0)  # inter-word
                 else:
-                    time.sleep(0.5)
+                    time.sleep(0.5)  # inter-character
+
             self.state = State.ADVANCING
+
 
 
 
         elif self.state == State.ADVANCING:
             print("➡️ Advancing to next message")
-            self.state = State.IDLE  
+            
+            if self.queue.should_skip():
+                skipped = self.queue.next_message()
+                print(f"⏩ Skipping message: {skipped}")
+                self.queue.clear_skip_flag()
+            
+            self.state = State.IDLE
+
+ 
+
+    def request_skip(self):
+        print("⏭️ Skip requested via button press")
+        self._skip_flag.set()
+
+    def _flatten_morse(self, morse_sequence: list[str]) -> str:
+        return ''.join(morse_sequence)
+
 

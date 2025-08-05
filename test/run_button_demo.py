@@ -11,7 +11,8 @@ from src.button_handler import ButtonHandler
 def on_button_press():
     print("✅ Callback: Button was pressed!")
 
-button = ButtonHandler(button_pin=18, callback=on_button_press)
+button = ButtonHandler(button_pin=18, callback=engine.request_skip)
+
 
 try:
     print("🟢 Waiting for button press... (CTRL+C to exit)")

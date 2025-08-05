@@ -1,40 +1,32 @@
 # src/message_queue.py
 
-from collections import deque
+from queue import Queue
 
 class MessageQueue:
     def __init__(self):
-        self._queue = deque()
-        self._current = None
+        self._queue = Queue()
+        self._skip_next = False  # Flag for skipping the next message
 
     def add_message(self, message: str):
-        self._queue.append(message)
+        self._queue.put(message)
 
-    def peek_current(self) -> str | None:
-        # Peek at the front of the queue (don't remove it)
-        if self._queue:
-            return self._queue[0]
-        return None
+    def next_message(self):
+        if self._queue.empty():
+            return None
+        return self._queue.get()
 
-    def next_message(self) -> str | None:
-        # Move to next message and store it as current
-        if self._queue:
-            self._current = self._queue.popleft()
-        else:
-            self._current = None
-        return self._current
+    def has_messages(self):
+        return not self._queue.empty()
 
-    def has_next(self) -> bool:
-        return bool(self._queue)
+    def size(self):
+        return self._queue.qsize()
 
-    def clear(self):
-        self._queue.clear()
-        self._current = None
+    def skip_next(self):
+        print("⏭️ Skip flag set. Next message will be skipped.")
+        self._skip_next = True
 
-    def size(self) -> int:
-        return len(self._queue)
+    def should_skip(self):
+        return self._skip_next
 
-    def skip_to_next(self):
-        self._current = None
-       
-
+    def clear_skip_flag(self):
+        self._skip_next = False
