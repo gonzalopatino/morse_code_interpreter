@@ -63,7 +63,9 @@ class MorseEngine(threading.Thread):
                 self.state = State.IDLE
                 return
             print(f"📥 Fetching: {self.current_message}")
-            self.lcd.show_message("Sending:", self.current_message[:16])
+            self.lcd.clear()
+            self.lcd.show_message("Sending:", self.current_message[:16].ljust(16))
+
             self.state = State.ENCODING
 
 
