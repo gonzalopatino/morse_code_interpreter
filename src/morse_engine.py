@@ -1,5 +1,13 @@
 # src/morse_engine.py
 
+# Morse Code Timing Constants (in seconds)
+DOT_DURATION = 0.5               # 1 unit
+DASH_DURATION = 1.5              # 3 units
+INTRA_CHAR_GAP = 0.5             # 1 unit (between dots/dashes)
+INTER_LETTER_GAP = 1.5           # 3 units
+INTER_WORD_GAP = 3.5             # 7 units
+
+
 import threading
 import time
 from enum import Enum, auto
@@ -75,24 +83,40 @@ class MorseEngine(threading.Thread):
             print(f"🔠 Morse (flat): {self.morse_sequence}")
             self.state = State.PLAYING
 
+        
+
         elif self.state == State.PLAYING:
             for symbol in self._flatten_morse(self.morse_sequence):
                 if self._stop_flag.is_set():
                     print("🛑 Stop flag detected during PLAYING")
-                    return False  # Exit thread
+                    return
+
                 if self._skip_flag.is_set():
                     print("⏩ Skipping current message...")
                     self._skip_flag.clear()
                     break
+
                 if symbol == ".":
                     self.leds.flash_dot()
+                    time.sleep(INTRA_CHAR_GAP)
                 elif symbol == "-":
                     self.leds.flash_dash()
+                    time.sleep(INTRA_CHAR_GAP)
                 elif symbol == "/":
-                    time.sleep(1.0)
+                    time.sleep(INTER_WORD_GAP)
                 else:
-                    time.sleep(0.5)
+                    time.sleep(INTER_LETTER_GAP)
+
             self.state = State.ADVANCING
+
+
+
+
+
+
+
+
+
 
         elif self.state == State.ADVANCING:
             print("➡️ Advancing to next message")

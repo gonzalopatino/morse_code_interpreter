@@ -1,5 +1,10 @@
 import time
 import threading
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from src.constants import DOT_DURATION, DASH_DURATION, INTRA_CHAR_GAP
 
 try:
     import RPi.GPIO as GPIO
@@ -19,22 +24,20 @@ class LEDController:
         GPIO.setup(self.blue_pin, GPIO.OUT)
 
     def flash_dot(self):
-        duration = 0.5
-        print(f"⚪ DOT: RED LED ON (GPIO {self.red_pin}) for {duration}s")
+        print(f"⚪ DOT: RED LED ON (GPIO {self.red_pin}) for {DOT_DURATION}s")
         GPIO.output(self.red_pin, GPIO.HIGH)
-        self._sleep_interruptible(duration)
+        self._sleep_interruptible(DOT_DURATION)
         GPIO.output(self.red_pin, GPIO.LOW)
-        print(f"🔴 RED LED OFF\n")
-        self._sleep_interruptible(0.2)
+        print("🔴 RED LED OFF\n")
+        self._sleep_interruptible(INTRA_CHAR_GAP)
 
     def flash_dash(self):
-        duration = 1.5
-        print(f"➖ DASH: BLUE LED ON (GPIO {self.blue_pin}) for {duration}s")
+        print(f"➖ DASH: BLUE LED ON (GPIO {self.blue_pin}) for {DASH_DURATION}s")
         GPIO.output(self.blue_pin, GPIO.HIGH)
-        self._sleep_interruptible(duration)
+        self._sleep_interruptible(DASH_DURATION)
         GPIO.output(self.blue_pin, GPIO.LOW)
-        print(f"🔵 BLUE LED OFF\n")
-        self._sleep_interruptible(0.2)
+        print("🔵 BLUE LED OFF\n")
+        self._sleep_interruptible(INTRA_CHAR_GAP)
 
     def _sleep_interruptible(self, duration):
         """Breaks sleep into 50ms intervals and checks for stop signal."""
